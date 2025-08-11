@@ -2016,19 +2016,38 @@ function! vimwiki#base#rename_file(...) abort
 endfunction
 
 
+" function! vimwiki#base#ui_select() abort
+"   " Spawn User Interface to select wiki project
+"   " Called by VimwikiUISelect (Globally Exported)
+"   call s:print_wiki_list()
+"   let idx = input('Select Wiki by number and press <Enter> (empty cancels): ')
+"   if idx ==# ''
+"     return
+"   elseif idx !~# '\m[0-9]\+'
+"     echo "\n"
+"     echom 'Invalid wiki selection.'
+"     return
+"   endif
+"   call vimwiki#base#goto_index(idx)
+" endfunction
+
 function! vimwiki#base#ui_select() abort
-  " Spawn User Interface to select wiki project
-  " Called by VimwikiUISelect (Globally Exported)
-  call s:print_wiki_list()
-  let idx = input('Select Wiki by number and press <Enter> (empty cancels): ')
-  if idx ==# ''
-    return
-  elseif idx !~# '\m[0-9]\+'
-    echo "\n"
-    echom 'Invalid wiki selection.'
-    return
-  endif
-  call vimwiki#base#goto_index(idx)
+  let l:wikis = []
+  let l:num_wikis = vimwiki#vars#number_of_wikis()
+  let l:current_idx = vimwiki#vars#get_bufferlocal('wiki_nr')
+
+  for l:idx in range(l:num_wikis)
+    let l:wpath = vimwiki#vars#get_wikilocal('path', l:idx)
+    let l:is_current = (l:idx == l:current_idx)
+
+    call add(l:wikis, {
+    \   'index': l:idx,
+    \   'path': l:wpath,
+    \   'is_current': l:is_current
+    \ })
+  endfor
+
+  return l:wikis
 endfunction
 
 
